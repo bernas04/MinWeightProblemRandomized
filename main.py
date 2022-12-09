@@ -1,6 +1,6 @@
 import sys, getopt
 import os
-from Graph import Graph
+from Graph import Graph, KargerAlgorithm
 
 
 
@@ -68,10 +68,13 @@ def useTeacherGraphs(folder):
 
         
 def generateRandomGraphs(numberOfGraphs):
+    if not os.path.exists("randomGraphs"):
+        os.makedirs("randomGraphs")
 
-    graph = Graph(nodes=10, edges=11)
+    os.chdir("randomGraphs")
 
-    """ for i in range(4, numberOfGraphs):
+    contador=0
+    for i in range(4, numberOfGraphs):
 
         nodesNumber = i
         maxEdges = (nodesNumber * (nodesNumber - 1)) / 2
@@ -80,8 +83,23 @@ def generateRandomGraphs(numberOfGraphs):
             edgesNumber = int(maxEdges * j)
 
             if edgesNumber >= nodesNumber-1:
-                print(nodesNumber, "",edgesNumber)
-                graph = Graph(nodes=nodesNumber, edges=edgesNumber) """
+
+                for m in range(10):
+                    contador+=1
+                    #print(f">>{m}: Karager Algorithm")
+
+                    print(f">>G{contador}(N{nodesNumber}, E{edgesNumber})")
+                    graph = Graph(nodes=nodesNumber, edges=edgesNumber)
+                    graph.drawGraph(f"G{contador}(N{nodesNumber}, E{edgesNumber})")
+
+                    alg = KargerAlgorithm(graph)
+
+                    minCut = alg.kargerMinCut(graph)
+
+                    print(">> ", minCut, "\n")
+
+
+    os.chdir("..")
 
             
 
