@@ -17,13 +17,17 @@ class Graph:
         if listEdges == []:
             self.listEdges, self.adjencyList = self.build_edges(edges)
         else:
-            self.listEdges = listEdges
+            listFinal = []
+            for i in listEdges:
+                no1, no2 = i.split(" ")
+                listFinal.append(tuple(sorted((no1, no2))))
+
+            self.listEdges = listFinal
             self.adjencyList = self.buildAdjencyList(self.listEdges)
 
         for i in self.listEdges:
             self.edgeWeight[i] = random.randint(1,15)
 
-        print(self.edgeWeight)
         self.nxGraph = nx.Graph()
 
         

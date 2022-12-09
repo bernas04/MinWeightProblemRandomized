@@ -1,4 +1,4 @@
-import sys, getopt
+import sys, getopt, time
 import os
 from Graph import Graph, KargerAlgorithm
 
@@ -37,11 +37,10 @@ def useTeacherGraphs(folder):
     # abrir os ficheiros que interessam para a execução do programa
     files = [i for i in os.listdir() if i.startswith("SW") and i.endswith(
         "G.txt") and "DG" not in i and "DAG" not in i]
-    
+    contador=0
     # para cada ficheiro, ler o grafo e executar o algoritmo
     for file in files:
-        if file != "SWtinyG.txt":
-            continue
+        
         f = open(file, "r")
         
         # ler a primeira linha: 0 se não é direcionado, 1 se é
@@ -59,12 +58,39 @@ def useTeacherGraphs(folder):
         edges = int(f.readline())
         # ler as restantes linhas: as arestas
         connections = f.readlines()
+        f.close()
 
         tmp_conn = [i.replace("\n", "") for i in connections]
 
+
+        if not os.path.exists("Solution"):
+            os.makedirs("Solution")
+        os.chdir("Solution")
+        f = open(f"G(N{nodes}, E{edges}).txt", "w")
+
+        allMinCut = []
+        allTime = []
+        for i in range(10):
+            start = time.time()
+            # criar o grafo
+            print(f">>{contador}: {file}", end="\r")
+
+            graph = Graph(nodes=nodes, edges=edges, listEdges=tmp_conn)
+            contador+=1
+            alg = KargerAlgorithm(graph)
+            edgesToCut, minCut = alg.kargerMinCut(graph)
+            end = time.time() - start
+            f.write(f">> G{i}(N{nodes}, E{edges}) - cost: {minCut}, edges: {edgesToCut}, time: {end}\n")
+            allMinCut.append(minCut)
+            allTime.append(end)
         
-        # criar o grafo
-        graph = Graph(nodes=nodes, edges=edges, listEdges=tmp_conn)
+        f.write(f"MinCut: {str(min(allMinCut))}, time: {str(sum(allTime)/len(allTime))}")
+        f.write("\n")
+        f.close()
+        os.chdir("..")
+
+
+
 
         
 def generateRandomGraphs(numberOfGraphs):
@@ -84,19 +110,29 @@ def generateRandomGraphs(numberOfGraphs):
 
             if edgesNumber >= nodesNumber-1:
 
+                f = open(f"G(N{nodesNumber}, E{edgesNumber}).txt", "w")
+                allMinCut = []
+                allTime = []
                 for m in range(10):
+                    start = time.time()
                     contador+=1
-                    #print(f">>{m}: Karager Algorithm")
 
-                    print(f">>G{contador}(N{nodesNumber}, E{edgesNumber})")
+                    print(f">>G{contador}(N{nodesNumber}, E{edgesNumber})", end="\r")
                     graph = Graph(nodes=nodesNumber, edges=edgesNumber)
                     graph.drawGraph(f"G{contador}(N{nodesNumber}, E{edgesNumber})")
 
                     alg = KargerAlgorithm(graph)
 
-                    minCut = alg.kargerMinCut(graph)
+                    edgesToCut, minCut = alg.kargerMinCut(graph)
 
-                    print(">> ", minCut, "\n")
+                    allMinCut.append(minCut)
+                    end = time.time() - start
+                    allTime.append(end)
+                    f.write(f">> G{m}(N{nodesNumber}, E{edgesNumber}) - cost: {minCut}, edges: {edgesToCut}, time: {end}\n")
+                    
+                f.write(f"MinCut: {str(min(allMinCut))}, time: {str(sum(allTime)/len(allTime))}")
+                f.write("\n")
+                f.close()
 
 
     os.chdir("..")
