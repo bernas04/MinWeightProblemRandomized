@@ -1,12 +1,14 @@
 import sys, getopt, time
 import os
-from Graph import Graph, KargerAlgorithm
+from Graph import Graph, KargerAlgorithm, GraphFirstProject
+import random
 
 
 
 
-GRAPHS = 15
+GRAPHS = 16
 EDGES_PERCENTAGE = [0.125, 0.25, 0.50, 0.75]
+STUDENT_NUMBER = 98679
 
 def main(argv):
 
@@ -54,6 +56,8 @@ def useTeacherGraphs(folder):
 
         # ler a terceira linha: número de nós
         nodes = int(f.readline())
+
+
         # ler a quarta linha: número de arestas
         edges = int(f.readline())
         # ler as restantes linhas: as arestas
@@ -73,7 +77,7 @@ def useTeacherGraphs(folder):
         for i in range(10):
             start = time.time()
             # criar o grafo
-            print(f">>{contador}: {file}", end="\r")
+            print(f">>{contador}: {file}" , end="\r")
 
             graph = Graph(nodes=nodes, edges=edges, listEdges=tmp_conn)
             contador+=1
@@ -94,42 +98,67 @@ def useTeacherGraphs(folder):
 
         
 def generateRandomGraphs(numberOfGraphs):
+
+    # manter a seed que foi usada no trabalho anterior
+    random.seed(STUDENT_NUMBER)
+
+    # criar a pasta para guardar os grafos gerados e informação sobre eles
     if not os.path.exists("randomGraphs"):
         os.makedirs("randomGraphs")
 
     os.chdir("randomGraphs")
 
     contador=0
+    # criar grafos com 4 a 16 nós
     for i in range(4, numberOfGraphs):
 
         nodesNumber = i
+        # número máximo de arestas
         maxEdges = (nodesNumber * (nodesNumber - 1)) / 2
 
+        # criar grafos com 12.5%, 25%, 50%, 75% do número máximo de arestas
         for j in EDGES_PERCENTAGE:
             edgesNumber = int(maxEdges * j)
 
+            # ver se o grafp é conexo
             if edgesNumber >= nodesNumber-1:
-
+                
+                # guardar a informação sobre o grafo
                 f = open(f"G(N{nodesNumber}, E{edgesNumber}).txt", "w")
+
+                # arrays que vão guardar todas as soluções e no fim escolhe a melhor de entre as presentes
                 allMinCut = []
                 allTime = []
+
+                # executar o algoritmo 10 vezes, para haver uma grande variedade de soluções
                 for m in range(10):
+                    # manter a seed que foi usada no trabalho anterior
+                    random.seed(STUDENT_NUMBER)
+
+                    # calcular o tempo
                     start = time.time()
                     contador+=1
-
                     print(f">>G{contador}(N{nodesNumber}, E{edgesNumber})", end="\r")
-                    graph = Graph(nodes=nodesNumber, edges=edgesNumber)
-                    graph.drawGraph(f"G{contador}(N{nodesNumber}, E{edgesNumber})")
 
+                    graph = GraphFirstProject(nodes=nodesNumber, edges=edgesNumber)
                     alg = KargerAlgorithm(graph)
 
                     edgesToCut, minCut = alg.kargerMinCut(graph)
-
-                    allMinCut.append(minCut)
-                    end = time.time() - start
-                    allTime.append(end)
-                    f.write(f">> G{m}(N{nodesNumber}, E{edgesNumber}) - cost: {minCut}, edges: {edgesToCut}, time: {end}\n")
                     
+                    # dar append ao array
+                    allMinCut.append(minCut)
+
+                    # tempo de execução final
+                    end = time.time() - start
+                    # dar append ao array
+                    allTime.append(end)
+
+                    # escrever no ficheiro a informação geral
+                    f.write(f">> G{m}(N{nodesNumber}, E{edgesNumber}) - cost: {minCut}, edges: {edgesToCut}, time: {end}\n")
+                    # desenhar o gráfico
+                    graph.drawGraph(f"G{contador}(N{nodesNumber}, E{edgesNumber}).png")
+                
+                # escrever no ficheiro a informação geral
                 f.write(f"MinCut: {str(min(allMinCut))}, time: {str(sum(allTime)/len(allTime))}")
                 f.write("\n")
                 f.close()
