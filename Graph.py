@@ -6,7 +6,6 @@ import math
 import time
 
 
-
 class Graph:
 
     def __init__(self, nodes, edges, listEdges=[]):
@@ -16,11 +15,10 @@ class Graph:
         self.nodesList = [int(i) for i in range(self.nodes)]
         self.edgeWeight = {}
 
-        self.nodesMerged = {str(i):str(i) for i in range(self.nodes)}
+        self.nodesMerged = {str(i): str(i) for i in range(self.nodes)}
 
         if listEdges == []:
             self.listEdges, self.adjencyList = self.build_edges(edges)
-
 
         else:
             listFinal = []
@@ -32,7 +30,7 @@ class Graph:
             self.adjencyList = self.buildAdjencyList(self.listEdges)
 
         for i in self.listEdges:
-            self.edgeWeight[i] = random.randint(1,15)
+            self.edgeWeight[i] = random.randint(1, 15)
 
         self.nxGraph = nx.Graph()
 
@@ -41,7 +39,7 @@ class Graph:
         isConnex = False
         while not isConnex:
             edges = []
-            i=0
+            i = 0
             while i < n_edges:
 
                 node1 = random.randint(0, self.nodes-1)
@@ -50,11 +48,11 @@ class Graph:
                     node2 = random.randint(0, self.nodes-1)
 
                 edge_sorted = tuple(sorted((node1, node2)))
-            
+
                 if edge_sorted not in edges:
                     edges.append(edge_sorted)
-                    i+=1
-            
+                    i += 1
+
             isConnex, adjencyList = self.connexGraph(self.nodes, edges)
         return edges, adjencyList
 
@@ -62,10 +60,10 @@ class Graph:
         """ Check if graph is connex """
         # {0: [1, 2, 3], 1: [0, 2], 2: [0, 1, 3], 3: [0, 2]}
         adjencyList = self.buildAdjencyList(connections)
-        
+
         if len(adjencyList) != nodes:
             return (False, None)
-        
+
         postitionBoolean = [False for i in range(nodes)]
         stack = []
 
@@ -75,13 +73,14 @@ class Graph:
             node = stack.pop()
             postitionBoolean[int(node)] = True
             neighbours = adjencyList[node]
-            [stack.append(i) for i in neighbours if not postitionBoolean[int(i)]]
-        
+            [stack.append(i)
+             for i in neighbours if not postitionBoolean[int(i)]]
+
         if postitionBoolean == [True for i in range(nodes)]:
             return (True, adjencyList)
         else:
             return (False, None)
-    
+
     def buildAdjencyList(self, listEdges) -> dict:
         """Create the adjency list of the graph in the form of a dictionary
             ex: {0: [1, 2, 3], 1: [0, 2], 2: [0, 1, 3], 3: [0, 2]}"""
@@ -103,21 +102,21 @@ class Graph:
                 tmp[node2] = [node1]
             else:
                 tmp[node2].append(node1)
-            
+
         return tmp
-            
+
     def drawGraph(self, fileName):
         """Draw the graph using the networkx library"""
 
         for tuple_edge in self.listEdges:
             node1, node2 = tuple_edge
-            self.nxGraph.add_edge(node1, node2, weight=self.edgeWeight[tuple_edge])
+            self.nxGraph.add_edge(
+                node1, node2, weight=self.edgeWeight[tuple_edge])
 
-        
         edge_labels = nx.get_edge_attributes(self.nxGraph, "weight")
 
         nx.draw(self.nxGraph, with_labels=True)
-        
+
         plt.savefig(fileName)
         plt.clf()
 
@@ -128,7 +127,7 @@ class Graph:
         self.listEdges.remove(edge)
         # nó inicial e nó final da aresta
         node_inicial, node_final = edge
-        
+
         node1 = self.nodesMerged[str(node_inicial)]
         node2 = self.nodesMerged[str(node_final)]
 
@@ -139,7 +138,6 @@ class Graph:
         startingNode = self.adjencyList[node1]
         endingNode = self.adjencyList[node2]
 
-
         # remover da lista de adjacências os nós que vão ser unidos
         for i in startingNode:
             if i == node2:
@@ -148,7 +146,6 @@ class Graph:
         for i in endingNode:
             if i == node1:
                 endingNode.remove(i)
-        
 
         allNodes = startingNode + endingNode
 
@@ -160,17 +157,16 @@ class Graph:
             if i in allNodes:
                 allNodes.remove(i)
 
-
         # dar update ao dicionário
         self.adjencyList[newKey] = allNodes
-        if node1!=node2:
+        if node1 != node2:
             del self.adjencyList[node1]
         del self.adjencyList[node2]
-        
+
         # guardar neste dicionario o nó e qual o novo nó que ele representa
         self.updateMergedNodes(newKey)
 
-        self.nodes-=1
+        self.nodes -= 1
 
     def updateMergedNodes(self, newKey):
         """Update the nodes merged dictionary"""
@@ -184,7 +180,7 @@ class GraphFirstProject:
         self.nodes = nodes
         self.edges = edges
 
-        self.nodesMerged = {str(i):str(i) for i in range(self.nodes)}
+        self.nodesMerged = {str(i): str(i) for i in range(self.nodes)}
 
         self.nodesPositions = self.buildNodes(nodes)
         self.edgeWeight = self.buildEdges(edges)
@@ -194,14 +190,14 @@ class GraphFirstProject:
         self.listEdges = list(self.edgeWeight.keys())
         self.nxGraph = nx.Graph()
 
-
     def mergeNodes(self, edge):
         # remover a aresta da lista de arestas
         self.listEdges.remove(edge)
         # nó inicial e nó final da aresta
         node_inicial, node_final = edge
-        
+
         node1 = self.nodesMerged[str(node_inicial)]
+
         node2 = self.nodesMerged[str(node_final)]
 
         if node1 == node2:
@@ -211,7 +207,6 @@ class GraphFirstProject:
         startingNode = self.adjencyList[node1]
         endingNode = self.adjencyList[node2]
 
-
         # remover da lista de adjacências os nós que vão ser unidos
         for i in startingNode:
             if i == node2:
@@ -220,7 +215,6 @@ class GraphFirstProject:
         for i in endingNode:
             if i == node1:
                 endingNode.remove(i)
-        
 
         allNodes = startingNode + endingNode
 
@@ -233,18 +227,16 @@ class GraphFirstProject:
             if i in allNodes:
                 allNodes.remove(i)
 
-
         # dar update ao dicionário
         self.adjencyList[newKey] = allNodes
-        if node1!=node2:
+        if node1 != node2:
             del self.adjencyList[node1]
         del self.adjencyList[node2]
-        
+
         # guardar neste dicionario o nó e qual o novo nó que ele representa
         self.updateMergedNodes(newKey)
 
-        self.nodes-=1
-
+        self.nodes -= 1
 
     def buildAdjencyList(self, listEdges):
         tmp = {}
@@ -263,14 +255,15 @@ class GraphFirstProject:
                 tmp[node2] = [node1]
             else:
                 tmp[node2].append(node1)
-            
+
         return tmp
 
     def buildNodes(self, n_nodes):
         nodes_positions = {}
 
         for i in range(n_nodes):
-            nodes_positions[str(i)] = (random.randint(1,20), random.randint(1,20))
+            nodes_positions[str(i)] = (
+                random.randint(1, 20), random.randint(1, 20))
 
         return nodes_positions
 
@@ -279,24 +272,24 @@ class GraphFirstProject:
 
         nodes = [str(i) for i in range(self.nodes)]
 
-        while(not isConnex):
+        while (not isConnex):
             connections = {}
             for i in range(edges):
                 # escolhe aleatoriamente dois nós
                 node1 = random.choice(nodes)
                 node2 = random.choice(nodes)
-                while(node1 == node2 ):
+                while (node1 == node2):
                     node2 = random.choice(nodes)
 
                 # forma o tuplo com os dois nós
                 aresta = (node1, node2)
                 aresta = tuple(sorted(aresta))
-                
+
                 # para não permitir mais que uma aresta entre dois nós
                 while (aresta in connections):
                     node1 = random.choice(nodes)
                     node2 = random.choice(nodes)
-                    while(node1 == node2 ):
+                    while (node1 == node2):
                         node2 = random.choice(nodes)
                     aresta = (node1, node2)
                     aresta = tuple(sorted(aresta))
@@ -304,10 +297,9 @@ class GraphFirstProject:
                 # calcula a distância entre os nós
                 distance = self.calculateDistance(node1, node2)
 
-
                 if aresta not in connections:
                     connections[aresta] = [distance]
-                
+
             isConnex = self.connexGraph(nodes, connections)
         return connections
 
@@ -318,15 +310,14 @@ class GraphFirstProject:
 
         distance = math.sqrt((x1-x2)**2 + (y1-y2)**2)
 
-        return round(distance,2)
+        return round(distance, 2)
 
     def connexGraph(self, nodes, connections):
-
         """ Check if graph is connex """
-        
+
         connection = [i for i in connections.keys()]
         out = set([item for t in connection for item in t])
-        
+
         if (set(nodes).difference(set(out))):
             return False
         return True
@@ -339,22 +330,24 @@ class GraphFirstProject:
 
     def drawGraph(self, name):
         for node1, node2 in self.edgeWeight.keys():
-            self.nxGraph.add_edge(node1, node2, weight=self.edgeWeight[(node1, node2)][0])
+            self.nxGraph.add_edge(
+                node1, node2, weight=self.edgeWeight[(node1, node2)][0])
         for node in self.nodesPositions.keys():
             self.nxGraph.add_node(node, pos=self.nodesPositions[node])
-        
+
         edge_labels = nx.get_edge_attributes(self.nxGraph, "weight")
         pos = nx.get_node_attributes(self.nxGraph, "pos")
         nx.draw_networkx_edge_labels(self.nxGraph, pos, edge_labels)
-        
+
         nx.draw(
-            self.nxGraph, 
+            self.nxGraph,
             pos,
             with_labels=True,
-            )
+        )
 
         plt.savefig(name, format="PNG")
         plt.close()
+
 
 class KargerAlgorithm:
     """Implementation of the Karger algorithm to find the minimum cut of a graph"""
@@ -362,10 +355,11 @@ class KargerAlgorithm:
     def __init__(self, graph):
         self.graph = graph
 
-
-    def kargerMinCut(self, graph, limit):
+    def kargerMinCut(self, graph):
         """Find the minimum cut of a graph using the Karger algorithm"""
-        while graph.nodes > limit:
+        numberBasicOperations = 0
+        while graph.nodes > 2:
+            numberBasicOperations += 1
             # choose a random edge
             try:
                 random.seed(time.time())
@@ -383,7 +377,4 @@ class KargerAlgorithm:
             else:
                 cost += graph.edgeWeight[i]
 
-        return graph.listEdges, cost
-        
-
-        
+        return graph.listEdges, cost, numberBasicOperations
